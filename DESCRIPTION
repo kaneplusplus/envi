@@ -1,0 +1,26 @@
+Package: envi
+Title: Manage R Environments
+Version: 0.0.1
+Authors@R: 
+Author: c(
+  person("Michael", "Kane",
+    role = c("aut", "cph", "cre"),
+    email = "michael.kane@yale.edu",
+    comment = "http://orcid.org/0000-0003-1899-6662"
+    ))
+Description: Manage R environments
+License: What license it uses
+Encoding: Apache License 2.0
+LazyData: true
+Imports:
+  cli,
+  crayon,
+  git2r,
+  jsonlite,
+  renv,
+  tibble
+Suggests:
+  knitr,
+  testthat
+VignetteBuilder: knitr
+Encoding: UTF-8
