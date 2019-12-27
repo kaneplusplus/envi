@@ -42,7 +42,7 @@ get_envi_path <- function() {
 #' @export
 envi_list <- function(env_info = FALSE) {
   if ( !dir.exists(get_envi_path()) ) {
-    warning(yellow("No environments available."))
+    warning(yellow("No environments available."), call. = FALSE)
     ret <- tibble(handle = character(), path = character())
   } else {
     if (!file.exists(file.path(get_envi_path(), "environments.rds"))) {
@@ -128,7 +128,7 @@ envi_activate <- function(handle) {
 envi_deactivate <- function(snapshot = TRUE, confirm = interactive(), 
                             force = FALSE) {
   if (is.null(envi_current_handle())) {
-    warning(yellow("No activated environment.`"))
+    warning(yellow("No activated environment.`"), call. = FALSE)
     invisible(FALSE)
   } else {
     renv::snapshot(envi_env_path(), confirm = confirm, force = force)
@@ -210,7 +210,8 @@ envi_clone  <- function(path, handle = basename(path),
   if (!looks_like_r_environment(env_path)) {
     warning(
       yellow( 
-        "Repository doesn't look like an renv object. It is being removed."))
+        "Repository doesn't look like an renv object. It is being removed."),
+      call. = FALSE)
     unlink(env_path, recursive = TRUE, force = TRUE)
     FALSE
   } else {
@@ -223,26 +224,42 @@ envi_clone  <- function(path, handle = basename(path),
 #' Uninstall an Environment
 #'
 #' @param handle the environment handle.
-#' @param ask should the user be prompted before removing the environment?
+#' @param confirm should the user be prompted before removing the environment?
 #' (Default TRUE)
 #' @param purge should all files in the environments directory be removed?
 #' (Default TRUE)
 #' @export
-envi_uninstall <- function(handle, ask = TRUE, purge = TRUE) {
+envi_uninstall <- function(handle, confirm = interactive(), purge = TRUE) {
+  # Is it a legitimate handle?  
+  el <- envi_list()
+  if ( !any(handle %in% el$handle)) {
+    stop(red("Environment handle", handle, "not found."))
+  }
+
   # If the handle is active then deactivate.
+  deactivate_if_activated(confirm = confirm, force = FALSE)
 
   # Unlink the environments directory.
+  if (purge) {
+    unlink(el$path[el$handle == handle], recursive = TRUE, force = TRUE)
+  }
+
+  # Remove the environment from the configuration.
+  el <- el[el$handle != handle,]
+  write_config(el, file.path(get_envi_path(), "enviroments.rds"))
+  invisible(TRUE)
 }
 
 #' Remove envi Configuration and Environments
 #' 
-#' @param ask should the user be prompted to make sure they want to purge
+#' @param confirm should the user be prompted to make sure they want to purge
 #' all envi environments? (Default TRUE)
 #' @param remove_internal_vars should the envi-internal environment be removed?
 #' (Default TRUE)
+#' @export
 #' @importFrom crayon red
-purge_envi <- function(ask = TRUE, remove_internal_vars = TRUE) {
-  if (ask) {
+purge_envi <- function(confirm = TRUE, remove_internal_vars = TRUE) {
+  if (confirm) {
     resp <- askYesNo(red("This will remove your envi environments and",
                          "cannot be undone. Are you sure you want to do",
                          "this?"))
@@ -257,7 +274,8 @@ purge_envi <- function(ask = TRUE, remove_internal_vars = TRUE) {
     # Remove the global variables
 
     # Unlink the ~/.envi directory with prejudice and abandon.
-    unlink("~/.envi", recursive = TRUE, force = TRUE)
+    unlink(get_envi_path(), recursive = TRUE, force = TRUE)
+    TRUE
   } else {
     FALSE
   }

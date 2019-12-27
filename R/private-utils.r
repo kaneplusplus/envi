@@ -31,7 +31,8 @@ deactivate_if_activated <- function(confirm = interactive(), force = FALSE) {
   handle <- envi_current_handle()
   if (!is.null(handle)) {
     warning(yellow("Deactivating current environment `", handle,
-                   "`.", sep = ""))
+                   "`.", sep = ""),
+            call. = FALSE)
   
     envi_deactivate(handle, confirm, force)
   }
