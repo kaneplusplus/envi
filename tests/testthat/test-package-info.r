@@ -1,12 +1,5 @@
 
-if (!testthat::is_testing()) {
-  library(testthat)
-  library(devtools)
-  document()
-} else {
-  context("Create and clone.")
-}
-
+context("Environment package information")
 
 expect_true(set_envi_path(tempdir()))
 

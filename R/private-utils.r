@@ -37,3 +37,14 @@ deactivate_if_activated <- function(confirm = interactive(), force = FALSE) {
     envi_deactivate(handle, confirm, force)
   }
 }
+
+# Shamelessly taken from devtools.
+yesno <- function(...) {
+    yeses <- c("Yes", "Definitely", "For sure", "Yup", "Yeah",
+        "Of course", "Absolutely")
+    nos <- c("No way", "Not yet", "I forget", "No", "Nope", "Uhhhh... Maybe?")
+    cat(paste0(..., collapse = ""))
+    qs <- c(sample(yeses, 1), sample(nos, 2))
+    rand <- sample(length(qs))
+    menu(qs[rand]) != which(rand == 1)
+}

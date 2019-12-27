@@ -1,11 +1,5 @@
 
-if (!testthat::is_testing()) {
-  library(testthat)
-  library(devtools)
-  document()
-} else {
-  context("Create and clone.")
-}
+context("Uninstall an environment")
 
 temp_dir_name <- tempdir()
 
@@ -32,6 +26,8 @@ expect_true(is.null(envi_current_handle()))
 
 expect_true(!file.exists(te2_path))
 
-expect_true(purge_envi(confirm = FALSE))
+envi_uninstall("test-env-1")
 
-expect_true(!dir.exists(temp_dir_name))
+# expect_true(purge_envi(confirm = FALSE))
+
+# expect_true(!dir.exists(temp_dir_name))

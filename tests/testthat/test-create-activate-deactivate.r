@@ -1,13 +1,5 @@
 
-if (!testthat::is_testing()) {
-  library(testthat)
-  library(devtools)
-  document()
-} else {
-  context("Create, activate, and deactive.")
-}
-
-library(renv)
+context("Create, activate, and deactive.")
 
 expect_true(set_envi_path(tempdir()))
 
@@ -56,4 +48,8 @@ expect_true(basename(el$path[3]) == "test-env-3")
 
 envi_deactivate(confirm = FALSE)
 
-unlink(get_envi_path(), recursive = TRUE, force = TRUE)
+envi_uninstall("test-env-1")
+envi_uninstall("test-env-2")
+envi_uninstall("test-env-3")
+
+#unlink(get_envi_path(), recursive = TRUE, force = TRUE)

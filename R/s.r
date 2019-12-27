@@ -250,6 +250,18 @@ envi_uninstall <- function(handle, confirm = interactive(), purge = TRUE) {
   invisible(TRUE)
 }
 
+# Shamelessly taken from devtools. 
+yesno <- function (...)
+{
+    yeses <- c("Yes", "Definitely", "For sure", "Yup", "Yeah",
+        "Of course", "Absolutely")
+    nos <- c("No way", "Not yet", "I forget", "No", "Nope", "Uhhhh... Maybe?")
+    cat(paste0(..., collapse = ""))
+    qs <- c(sample(yeses, 1), sample(nos, 2))
+    rand <- sample(length(qs))
+    menu(qs[rand]) != which(rand == 1)
+}
+
 #' Remove envi Configuration and Environments
 #' 
 #' @param confirm should the user be prompted to make sure they want to purge
@@ -260,9 +272,9 @@ envi_uninstall <- function(handle, confirm = interactive(), purge = TRUE) {
 #' @importFrom crayon red
 purge_envi <- function(confirm = TRUE, remove_internal_vars = TRUE) {
   if (confirm) {
-    resp <- askYesNo(red("This will remove your envi environments and",
-                         "cannot be undone. Are you sure you want to do",
-                         "this?"))
+    resp <- yesno(red("This will remove your envi environments and",
+                      "cannot be undone. Are you sure you want to do",
+                      "this?"))
   } else {
     resp <- TRUE
   }

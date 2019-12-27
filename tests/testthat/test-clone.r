@@ -1,12 +1,5 @@
 
-if (!testthat::is_testing()) {
-  library(testthat)
-  library(devtools)
-  document()
-} else {
-  context("Create and clone.")
-}
-
+context("Create and clone.")
 
 expect_true(set_envi_path(tempdir()))
 
@@ -29,10 +22,12 @@ expect_true(el$handle[1] == "test-env-1")
 
 expect_error(envi_clone(envi_env_path(el$handle[1])))
 
-expect_true(envi_clone(envi_env_path("test-env-1"), "test-env-1-clone"))
+expect_warning(
+  expect_true(envi_clone(envi_env_path("test-env-1"), "test-env-1-clone")))
 
 expect_true(envi_activate("test-env-1-clone"))
 
 commits(envi_env_path())
 
-unlink(get_envi_path(), recursive = TRUE, force = TRUE)
+envi_uninstall("test-env-1")
+envi_uninstall("test-env-1-clone")
