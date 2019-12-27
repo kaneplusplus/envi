@@ -35,28 +35,53 @@ get_envi_path <- function() {
 
 #' List the Current Available Environments
 #'
+#' @param env_info should individual environment information be included? 
+#' (Default FALSE)
 #' @importFrom tibble tibble
 #' @importFrom crayon yellow
 #' @export
-envi_list <- function() {
+envi_list <- function(env_info = FALSE) {
   if ( !dir.exists(get_envi_path()) ) {
     warning(yellow("No environments available."))
-    tibble(handle = character(), path = character())
+    ret <- tibble(handle = character(), path = character())
   } else {
     if (!file.exists(file.path(get_envi_path(), "environments.rds"))) {
-      tibble(handle = character(), path = character())
+      ret <- tibble(handle = character(), path = character())
     } else {
-      readRDS(file.path(get_envi_path(), "environments.rds"))
+      ret <- readRDS(file.path(get_envi_path(), "environments.rds"))
     }
   }
+  if (env_info) {
+    ret$info <- lapply(ret$handle, envi_env_info)
+  }
+  ret
 }
 
 #' Get an Environments Packages and Versions
 #' 
 #' @param handle the handle of the environment to get the package list for.
+#' @importFrom crayon red
+#' @importFrom desc description
 #' @export
-envi_packages <- function(handle) {
-  # call dir use desc package
+envi_env_info <- function(handle) {
+  el <- envi_list()
+  if ( !any(handle %in% el$handle)) {
+    stop(red("Environment handle", handle, "not found."))
+  }
+  dl <- dir(file.path(el$path[el$handle == handle]), recursive = TRUE,
+            pattern = "^DESCRIPTION$")
+  dsl <- strsplit(dl, .Platform$file.sep)
+  
+  r_vers <- vapply(dsl, function(x) x[3], NA_character_)
+  ret <- tibble(r_version = r_vers)
+  ret$platform <- vapply(dsl, function(x) x[4], NA_character_)
+  ret$package <- vapply(dsl, function(x) x[5], NA_character_)
+  ret$package_version <- NA_character_
+  for (i in seq_len(nrow(ret))) {
+    d <- description$new(file = file.path(el$path[el$handle == handle], dl[i]))
+    ret$package_version[i] <- d[['get']]('Version')
+  }
+  ret
 }
 
 #' Get the path to an Environment
