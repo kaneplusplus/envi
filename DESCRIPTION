@@ -14,9 +14,8 @@ Imports:
   cli,
   crayon,
   desc,
-  git2r,
-  jsonlite,
-  tibble
+  tibble,
+  git2r
 Suggests:
   renv,
   knitr,

@@ -20,9 +20,12 @@ set_current_handle <- function(handle) {
 
 #' @importFrom crayon red
 check_renv_installed <- function() {
-  if ( !("renv" %in% installed.packages()[,"Package"]) ) {
-    stop(red("The renv package needs to be installed to run this function."))
-  }
+  tryCatch(
+    renv::activate,
+    error = function(e) {
+      stop(red("The renv package needs to be installed to run this function."))
+      e
+    })
   invisible(TRUE)
 }
 

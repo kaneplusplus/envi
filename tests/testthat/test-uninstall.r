@@ -9,18 +9,18 @@ el <- envi_list()
 
 expect_true(nrow(el) == 0)
 
-expect_true(envi_create("test-env-1"))
+expect_warning(expect_true(envi_create("test-env-1")))
 
 expect_true(envi_current_handle() == "test-env-1")
 
 
-expect_true(envi_create("test-env-2"))
+expect_warning(expect_true(envi_create("test-env-2")))
 
 el <- envi_list()
 
 te2_path <- el$path[el$handle == "test-env-2"]
 
-expect_true(envi_uninstall("test-env-2"))
+expect_warning(expect_true(envi_uninstall("test-env-2")))
 
 expect_true(is.null(envi_current_handle()))
 

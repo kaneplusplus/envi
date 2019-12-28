@@ -37,8 +37,8 @@ get_envi_path <- function() {
 #'
 #' @param env_info should individual environment information be included? 
 #' (Default FALSE)
-#' @importFrom tibble tibble
 #' @importFrom crayon yellow
+#' @importFrom tibble tibble
 #' @export
 envi_list <- function(env_info = FALSE) {
   if ( !dir.exists(get_envi_path()) ) {
@@ -62,6 +62,7 @@ envi_list <- function(env_info = FALSE) {
 #' @param handle the handle of the environment to get the package list for.
 #' @importFrom crayon red
 #' @importFrom desc description
+#' @importFrom tibble tibble
 #' @export
 envi_env_info <- function(handle) {
   el <- envi_list()
@@ -153,6 +154,7 @@ envi_deactivate <- function(snapshot = TRUE, confirm = interactive(),
 #' (Default TRUE)
 #' @importFrom git2r init
 #' @importFrom crayon red yellow
+#' @importFrom tibble tibble
 #' @export
 envi_create <- function(handle, full_name = handle, bare = FALSE, 
                         git_init = TRUE) {
@@ -178,7 +180,7 @@ envi_create <- function(handle, full_name = handle, bare = FALSE,
   l <- rbind(l, 
              tibble(handle = handle, 
                     path = file.path(get_envi_path(), "environments", 
-                                     full_name)))
+                                         full_name)))
   write_config(l, file.path(get_envi_path(), "environments.rds"))
   set_current_handle(handle)
   invisible(TRUE)
@@ -192,6 +194,7 @@ envi_create <- function(handle, full_name = handle, bare = FALSE,
 #' @param progress should the progress of the clone be shown? (Default verbose)
 #' @importFrom git2r clone
 #' @importFrom crayon red
+#' @importFrom tibble tibble
 #' @export
 envi_clone  <- function(path, handle = basename(path), 
                         verbose = TRUE, progress = verbose) {
@@ -212,7 +215,6 @@ envi_clone  <- function(path, handle = basename(path),
   if (verbose) {
     cat("Cloning the repository")
   }
-  browser()
   clone(path, env_path, progress = verbose)
   # Does it look like an environment?
   if (!looks_like_r_environment(env_path)) {
@@ -223,7 +225,7 @@ envi_clone  <- function(path, handle = basename(path),
     unlink(env_path, recursive = TRUE, force = TRUE)
     FALSE
   } else {
-    l <- rbind(l, tibble(handle = handle, path = path))
+    l <- rbind(l, tibble(handle = handle, path = env_path))
     write_config(l, file.path(get_envi_path(), "environments.rds"))
     invisible(TRUE)
   }
@@ -254,7 +256,7 @@ envi_uninstall <- function(handle, confirm = interactive(), purge = TRUE) {
 
   # Remove the environment from the configuration.
   el <- el[el$handle != handle,]
-  write_config(el, file.path(get_envi_path(), "enviroments.rds"))
+  write_config(el, file.path(get_envi_path(), "environments.rds"))
   invisible(TRUE)
 }
 
