@@ -111,9 +111,13 @@ envi_env_path <- function(handle = envi_current_handle()) {
 #' @param handle the environment handle.
 #' @export
 envi_activate <- function(handle) {
+  if ( !any(handle %in% envi_list()$handle)) {
+    stop(red("Environment handle", handle, "not found."))
+  }
   check_renv_installed()
   deactivate_if_activated()
   renv::activate(envi_env_path(handle))
+  set_current_handle(handle)
   invisible(TRUE)
 }
 
@@ -199,12 +203,16 @@ envi_clone  <- function(path, handle = basename(path),
   env_path <- file.path(get_envi_path(), "environments")
   if (!dir.exists(env_path)) {
     dir.create(env_path)
-  }
+  } 
   env_path <- file.path(env_path, handle)
+  while (dir.exists(env_path)) {
+    env_path <- paste0(env_path, "-clone")
+  }
   deactivate_if_activated()
   if (verbose) {
     cat("Cloning the repository")
   }
+  browser()
   clone(path, env_path, progress = verbose)
   # Does it look like an environment?
   if (!looks_like_r_environment(env_path)) {
@@ -230,7 +238,7 @@ envi_clone  <- function(path, handle = basename(path),
 #' (Default TRUE)
 #' @export
 envi_uninstall <- function(handle, confirm = interactive(), purge = TRUE) {
-  # Is it a legitimate handle?  
+  # Is it a legitimate handle?
   el <- envi_list()
   if ( !any(handle %in% el$handle)) {
     stop(red("Environment handle", handle, "not found."))

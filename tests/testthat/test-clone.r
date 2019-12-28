@@ -1,6 +1,10 @@
 
 context("Create and clone.")
 
+library(devtools)
+library(testthat)
+document()
+
 expect_true(set_envi_path(tempdir()))
 
 el <- envi_list()
