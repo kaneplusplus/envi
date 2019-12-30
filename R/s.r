@@ -344,7 +344,7 @@ envi_checkpoint <- function(handle = envi_current_handle()) {
 #' @param clean should untrackec files be deleted? (Default TRUE)
 #' @param confirm should the user be asked before removing files? (Default TRUE)
 #' @param verbose should extra information be printed? (Default TRUE)
-#' @importFrom git2r status reset repository
+#' @importFrom git2r status reset repository commit remote_url
 #' @export
 envi_hard_reset <- function(handle = envi_current_handle(), clean = TRUE, 
                             confirm = TRUE, verbose = TRUE) {
@@ -359,15 +359,13 @@ envi_hard_reset <- function(handle = envi_current_handle(), clean = TRUE,
   if (!confirm || 
       !yesno("This will reset the current state of your environment",
              "are you sure you want to proceed?")) {
-    browser()
     untracked <- as.character(unlist(status(path)$untracked))
     del_msg <- paste0("The following files will be deleted:\n\t", 
                       paste(untracked, collapse = "\n\t"))
     if (length(untracked)) {
-      browser()
       if (verbose && !confirm && clean) {
         cat(del_msg, "\n")
-        unlink(untracked)
+        unlink(file.path(path, untracked))
       }
       else if (confirm && clean) {
         if(!yesno(yellow(del_msg))) {
@@ -381,10 +379,12 @@ envi_hard_reset <- function(handle = envi_current_handle(), clean = TRUE,
         }
       }
     }
+    deactivate_if_activated()
     if (verbose) {
       cat("Resetting the repository.")
     }
-    reset(repository(path), reset_type = "hard")
+    cmts <- commits(path)
+    reset(cmts[[length(cmts)]], reset_type = "hard")
     invisible(TRUE)
   } else {
     if (verbose) {
