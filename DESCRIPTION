@@ -17,9 +17,10 @@ Imports:
   tibble,
   git2r
 Suggests:
-  renv,
-  knitr,
-  testthat
+    renv,
+    knitr,
+    testthat,
+    covr
 VignetteBuilder: knitr
 Encoding: UTF-8
 RoxygenNote: 7.0.2

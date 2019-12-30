@@ -26,7 +26,9 @@ expect_true(is.null(envi_current_handle()))
 
 expect_true(!file.exists(te2_path))
 
-envi_uninstall("test-env-1")
+expect_true(envi_uninstall("test-env-1"))
+
+expect_error(envi_uninstall("test-env-1"))
 
 # expect_true(purge_envi(confirm = FALSE))
 

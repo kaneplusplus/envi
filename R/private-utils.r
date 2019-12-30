@@ -41,6 +41,17 @@ deactivate_if_activated <- function(confirm = interactive(), force = FALSE) {
   }
 }
 
+#' @importFrom git2r repository
+is_repo <- function(path) {
+  tryCatch({
+      repository(path)
+      TRUE
+    },
+    error = function(e) {
+      FALSE
+    })
+}
+
 # Shamelessly taken from devtools.
 yesno <- function(...) {
     yeses <- c("Yes", "Definitely", "For sure", "Yup", "Yeah",

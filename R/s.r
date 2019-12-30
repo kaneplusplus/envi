@@ -14,11 +14,11 @@ set_envi_path <- function(path) {
     }
     assign("path", path, pos = envi_globals, inherits = FALSE)
     invisible(TRUE)
-  }, error = function(e) {
+  }, warning = function(w) {
     if (exists("path", where = envi_globals, inherits = FALSE)) {
       remove("path", envir = envi_globals)
     }
-    e
+    w
   })
 }
 
@@ -260,42 +260,40 @@ envi_uninstall <- function(handle, confirm = interactive(), purge = TRUE) {
   invisible(TRUE)
 }
 
-# Shamelessly taken from devtools. 
-yesno <- function (...)
-{
-    yeses <- c("Yes", "Definitely", "For sure", "Yup", "Yeah",
-        "Of course", "Absolutely")
-    nos <- c("No way", "Not yet", "I forget", "No", "Nope", "Uhhhh... Maybe?")
-    cat(paste0(..., collapse = ""))
-    qs <- c(sample(yeses, 1), sample(nos, 2))
-    rand <- sample(length(qs))
-    menu(qs[rand]) != which(rand == 1)
-}
-
 #' Remove envi Configuration and Environments
 #' 
 #' @param confirm should the user be prompted to make sure they want to purge
 #' all envi environments? (Default TRUE)
-#' @param remove_internal_vars should the envi-internal environment be removed?
-#' (Default TRUE)
 #' @export
 #' @importFrom crayon red
-purge_envi <- function(confirm = TRUE, remove_internal_vars = TRUE) {
+purge_envi <- function(confirm = TRUE) {
   if (confirm) {
-    resp <- yesno(red("This will remove your envi environments and",
-                      "cannot be undone. Are you sure you want to do",
-                      "this?"))
+    resp <- !yesno(red("This will remove your envi environments and",
+                       "cannot be undone. Are you sure you want to do",
+                       "this?"))
   } else {
     resp <- TRUE
   }
   if (isTRUE(resp)) {
-    # TODO purge the environment.
+    # Purge the environment.
 
     # Deactivate the current environment.
+    deactivate_if_activated(confirm = confirm, force = FALSE)
+
+    # Uninstall the environments.
+    for (handle in envi_list()$handle) {
+      envi_uninstall(handle, confirm = FALSE, purge = TRUE)
+    }
 
     # Remove the global variables
+    if (exists("path", where = envi_globals, inherits = FALSE)) {
+      remove("path", envir = envi_globals)
+    } 
+    if (exists("handle", where = envi_globals, inherits = FALSE)) {
+      remove("handle", envir = envi_globals)
+    }
 
-    # Unlink the ~/.envi directory with prejudice and abandon.
+    # Unlink the envi path directory with prejudice and abandon.
     unlink(get_envi_path(), recursive = TRUE, force = TRUE)
     TRUE
   } else {
@@ -341,14 +339,57 @@ envi_checkpoint <- function(handle = envi_current_handle()) {
 
 #' Reset a Remote Environment
 #'
-#' @param handle the environment handle.
-#' @param clean should file that are not part of the repository be removed?
-#' (Default FALSE)
+#' @param handle the environment handle. If not specified the current 
+#' activated handle is used.
+#' @param clean should untrackec files be deleted? (Default TRUE)
+#' @param confirm should the user be asked before removing files? (Default TRUE)
+#' @param verbose should extra information be printed? (Default TRUE)
+#' @importFrom git2r status reset repository
 #' @export
-envi_hard_reset <- function(handle, clean = FALSE) {
-  # WARNING: do note this deletes untracked files
-  #status() %>%
-  #  purrr::pluck("untracked") %>%
-  #  rlang::flatten_chr() %>%
-  #  unlink()
+envi_hard_reset <- function(handle = envi_current_handle(), clean = TRUE, 
+                            confirm = TRUE, verbose = TRUE) {
+  el <- envi_list()
+  if (!handle %in% el$handle) {
+    stop(red("Environment handle", handle, "not found."))
+  }
+  path <- el$path[el$handle == handle]
+  if (!is_repo(path)) {
+    stop(stop("The", handle, "environment doesn't look like a repository."))
+  }
+  if (!confirm || 
+      !yesno("This will reset the current state of your environment",
+             "are you sure you want to proceed?")) {
+    browser()
+    untracked <- as.character(unlist(status(path)$untracked))
+    del_msg <- paste0("The following files will be deleted:\n\t", 
+                      paste(untracked, collapse = "\n\t"))
+    if (length(untracked)) {
+      browser()
+      if (verbose && !confirm && clean) {
+        cat(del_msg, "\n")
+        unlink(untracked)
+      }
+      else if (confirm && clean) {
+        if(!yesno(yellow(del_msg))) {
+          unlink(untracked)
+        }
+      } else if (clean) {
+        unlink(untracked)
+      } else {
+        if (verbose) {
+          cat("Leaving untracked files.\n")
+        }
+      }
+    }
+    if (verbose) {
+      cat("Resetting the repository.")
+    }
+    reset(repository(path), reset_type = "hard")
+    invisible(TRUE)
+  } else {
+    if (verbose) {
+      cat("Aborting reset.")
+      invisible(FALSE)
+    }
+  }
 }

@@ -4,14 +4,11 @@
 \alias{purge_envi}
 \title{Remove envi Configuration and Environments}
 \usage{
-purge_envi(confirm = TRUE, remove_internal_vars = TRUE)
+purge_envi(confirm = TRUE)
 }
 \arguments{
 \item{confirm}{should the user be prompted to make sure they want to purge
 all envi environments? (Default TRUE)}
-
-\item{remove_internal_vars}{should the envi-internal environment be removed?
-(Default TRUE)}
 }
 \description{
 Remove envi Configuration and Environments

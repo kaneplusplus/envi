@@ -4,13 +4,22 @@
 \alias{envi_hard_reset}
 \title{Reset a Remote Environment}
 \usage{
-envi_hard_reset(handle, clean = FALSE)
+envi_hard_reset(
+  handle = envi_current_handle(),
+  clean = TRUE,
+  confirm = TRUE,
+  verbose = TRUE
+)
 }
 \arguments{
-\item{handle}{the environment handle.}
+\item{handle}{the environment handle. If not specified the current 
+activated handle is used.}
 
-\item{clean}{should file that are not part of the repository be removed?
-(Default FALSE)}
+\item{clean}{should untrackec files be deleted? (Default TRUE)}
+
+\item{confirm}{should the user be asked before removing files? (Default TRUE)}
+
+\item{verbose}{should extra information be printed? (Default TRUE)}
 }
 \description{
 Reset a Remote Environment

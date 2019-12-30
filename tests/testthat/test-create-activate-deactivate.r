@@ -1,6 +1,12 @@
 
 context("Create, activate, and deactive.")
 
+tempdir_ro <- paste0(tempdir(), "-read-only")
+
+suppressWarnings(dir.create(tempdir_ro, mode = "0444"))
+
+set_envi_path(file.path(tempdir_ro, "read-only-error"))
+
 expect_true(set_envi_path(tempdir()))
 
 el <- envi_list()
@@ -9,6 +15,8 @@ expect_true(nrow(el) == 0)
 
 expect_warning(expect_true(
   envi_create("test-env-1", "testing-environment-number-1", bare = FALSE)))
+
+expect_error(envi_create("test-env-1"))
 
 expect_true(envi_current_handle() == "test-env-1")
 

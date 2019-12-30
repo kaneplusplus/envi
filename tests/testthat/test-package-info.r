@@ -16,3 +16,5 @@ el <- envi_list(env_info = TRUE)
 envi_env_info("test-env-1")
 
 expect_warning(expect_true(envi_uninstall("test-env-1")))
+
+expect_error(envi_env_info("this-is-not-an-environment"))
