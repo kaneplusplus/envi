@@ -20,7 +20,8 @@ Suggests:
   covr,
   knitr,
   renv,
-  testthat
+  testthat,
+  cli
 VignetteBuilder: knitr
 Encoding: UTF-8
 RoxygenNote: 7.0.2
