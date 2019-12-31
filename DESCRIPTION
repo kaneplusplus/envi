@@ -7,20 +7,20 @@ Authors@R: c(
     email = "michael.kane@yale.edu",
     comment = "http://orcid.org/0000-0003-1899-6662"
     ))
-Description: Manage R environments
+Description: A package for retrieving and managing virtual environments.
 License: Apache License 2.0
 LazyData: true
 Imports:
-  cli,
   crayon,
   desc,
+  git2r,
   tibble,
-  git2r
+  utils
 Suggests:
-    renv,
-    knitr,
-    testthat,
-    covr
+  covr,
+  knitr,
+  renv,
+  testthat
 VignetteBuilder: knitr
 Encoding: UTF-8
 RoxygenNote: 7.0.2

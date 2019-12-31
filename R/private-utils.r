@@ -53,6 +53,7 @@ is_repo <- function(path) {
 }
 
 # Shamelessly taken from devtools.
+#' @importFrom utils menu
 yesno <- function(...) {
     yeses <- c("Yes", "Definitely", "For sure", "Yup", "Yeah",
         "Of course", "Absolutely")
