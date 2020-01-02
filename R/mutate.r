@@ -58,7 +58,7 @@ envi_deactivate <- function(snapshot = TRUE, confirm = interactive(),
   }
 }
 
-#' Create an R Environment
+#' Initialize an R Environment
 #'
 #' @param handle the name of the new environment.
 #' @param full_name the name of the environment directory. (Defalt is the
@@ -71,8 +71,8 @@ envi_deactivate <- function(snapshot = TRUE, confirm = interactive(),
 #' @importFrom crayon red yellow
 #' @importFrom tibble tibble
 #' @export
-envi_create <- function(handle, full_name = handle, bare = FALSE, 
-                        git_init = TRUE) {
+envi_init <- function(handle, full_name = handle, bare = FALSE, 
+                      git_init = TRUE) {
   l <- envi_list()
   if (nrow(l) > 0 && 
       (handle %in% l$handle || 
@@ -101,6 +101,115 @@ envi_create <- function(handle, full_name = handle, bare = FALSE,
   invisible(TRUE)
 }
 
+#' Install a Remote Environment
+#'
+#' @param path the path of the repository housing the R environment to clone.
+#' @param handle the handle for the new environment.
+#' @param verbose should extra information be printed? (Default TRUE)
+#' @param progress should the progress of the clone be shown? (Default verbose)
+#' @importFrom piggyback pb_download
+#' @importFrom crayon red
+#' @importFrom tibble tibble
+#' @export
+#' @export
+envi_url_install <- function(path, handle = basename(path), 
+                            verbose = TRUE, progress = verbose) {
+}
+
+#' Install a Piggyback'ed Environment
+#'
+#' @param file name or vector of names of files to be downloaded.
+#' @param repo Repository name in format "owner/repo". Will guess the
+#' current repo if not specified.
+#' @param handle the handle for the new environment.
+#' @param tag tag for the GitHub release to which this data is attached.
+#' (Default "latest")
+#' @param verbose should extra information be printed? (Default TRUE)
+#' @param progress should the progress of the clone be shown? (Default verbose)
+#' @param keep should the original downloaded environment be kept? 
+#' (Default FALSE)
+#' @importFrom piggyback pb_download
+#' @importFrom crayon red
+#' @importFrom tibble tibble
+#' @importFrom piggyback pb_download pb_list
+#' @export
+envi_pb_install <- function(file, repo, 
+                            handle = basename(file), 
+                            tag = "latest",
+                            verbose = TRUE, progress = verbose,
+                            keep = FALSE) {
+
+  if (is.null(file)) {
+    stop(red("You must specify a file to download."))
+  }
+  if (length(file) > 1) {
+    stop(red("You may only install a single piggyback'ed environment at a",
+             "time."))
+  }
+
+  check_if_handle_installed(handle)
+  env_path <- make_env_path()
+  env_path <- file.path(env_path, handle)
+  while (dir.exists(env_path)) {
+    env_path <- paste0(env_path, "-pb")
+  }
+
+  if (verbose) {
+    cat("Downloading piggyback'ed environment.\n")
+  }
+  
+  if (FALSE) {
+    pb_download(file = file, dest = tempdir(), repo = repo, tag = tag)
+  } else {
+    pbi <- pb_list(repo = repo, tag = tag)
+    if ( !(file %in% basename(pbi$file_name)) ) {
+      stop(red("Could not find file: ", file, 
+               "\nAvailable files are:\n\t",
+               paste(pbi$file_name, sep = "\n\t")))
+    }
+    # Temporary fix while pb_download has issues.
+    gh_file <- piggyback:::pb_info(repo = repo, tag = tag)$browser_download_url
+    gh_file <- gh_file[file == basename(gh_file)]
+    download.file(gh_file,
+                  file.path(tempdir(), file), 
+                  quiet = !progress)
+  }
+  ret <- envi_install_local_compressed(file.path(tempdir(), file), handle, 
+    verbose = verbose, progress = progress)
+ 
+  if (!keep) {
+    unlink(file.path(tempdir(), file))
+  } 
+  ret
+}
+
+#' Install a Local Compressed R Environment
+#'
+#' @param path the path of a compressed environment.
+#' @param handle the handle for the new environment.
+#' @param verbose should extra information be printed? (Default TRUE)
+#' @param progress should the progress of the clone be shown? (Default verbose)
+#' @importFrom git2r clone
+#' @importFrom tibble tibble
+#' @importFrom utils download.file untar unzip
+#' @export
+envi_install_local_compressed <- function(path, handle = basename(path), 
+                        verbose = TRUE, progress = verbose) {
+
+  env_dir <- unlist(strsplit(basename(path), "\\."))
+  browser()
+  if (env_dir[length(env_dir)] == "zip") {
+    decompress <- unzip
+    env_dir <- paste(env_dir[1:(length(env_dir)-1)], collapse = ".")
+  } else {
+    decompress <- untar
+    env_dir <- paste(env_dir[1:(length(env_dir)-2)], collapse = ".")
+  }
+  decompress(path, exdir = file.path(get_envi_path(), "environments"))
+  add_if_r_environment(handle, 
+    file.path(get_envi_path(), "environments", env_dir))
+}
+
 #' Clone an R Environment
 #'
 #' @param path the path of the repository housing the R environment to clone.
@@ -108,42 +217,26 @@ envi_create <- function(handle, full_name = handle, bare = FALSE,
 #' @param verbose should extra information be printed? (Default TRUE)
 #' @param progress should the progress of the clone be shown? (Default verbose)
 #' @importFrom git2r clone
-#' @importFrom crayon red
 #' @importFrom tibble tibble
 #' @export
 envi_clone  <- function(path, handle = basename(path), 
                         verbose = TRUE, progress = verbose) {
-  l <- envi_list()
-  if (handle %in% l$handle) {
-    stop(red("The handle is already in use. Note that for local source", 
-             "repositories you must supply a unique handle"))
-  }
-  env_path <- file.path(get_envi_path(), "environments")
-  if (!dir.exists(env_path)) {
-    dir.create(env_path)
-  } 
+
+  check_if_handle_installed(handle)
+  env_path <- make_env_path()
   env_path <- file.path(env_path, handle)
   while (dir.exists(env_path)) {
     env_path <- paste0(env_path, "-clone")
   }
+
   deactivate_if_activated()
+
   if (verbose) {
     cat("Cloning the repository")
   }
   clone(path, env_path, progress = verbose)
-  # Does it look like an environment?
-  if (!looks_like_r_environment(env_path)) {
-    warning(
-      yellow( 
-        "Repository doesn't look like an renv object. It is being removed."),
-      call. = FALSE)
-    unlink(env_path, recursive = TRUE, force = TRUE)
-    FALSE
-  } else {
-    l <- rbind(l, tibble(handle = handle, path = env_path))
-    write_config(l, file.path(get_envi_path(), "environments.rds"))
-    invisible(TRUE)
-  }
+
+  add_if_r_environment(handle, env_path)
 }
 
 #' Uninstall an Environment

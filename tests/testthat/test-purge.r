@@ -9,7 +9,7 @@ el <- envi_list()
 
 expect_true(nrow(el) == 0)
 
-expect_true(suppressWarnings(envi_create("test-env-1")))
+expect_true(suppressWarnings(envi_init("test-env-1")))
 
 expect_true(envi_current_handle() == "test-env-1")
 
@@ -22,3 +22,5 @@ envi_globals <- new.env(parent=emptyenv())
 # expect_true(purge_envi(confirm = FALSE))
 
 # expect_true(!dir.exists(temp_dir_name))
+
+suppressWarnings(envi_deactivate())

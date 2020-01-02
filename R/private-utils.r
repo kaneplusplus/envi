@@ -29,6 +29,42 @@ check_renv_installed <- function() {
   invisible(TRUE)
 }
 
+#' @importFrom crayon red
+check_if_handle_installed <- function(handle) {
+  l <- envi_list()
+  if (handle %in% l$handle) {
+    stop(red("The handle is already in use. Note that for local source",
+             "repositories you must supply a unique handle"))
+  } 
+  invisible(TRUE)
+}
+
+make_env_path <- function() {
+  env_path <- file.path(get_envi_path(), "environments")
+  if (!dir.exists(env_path)) {
+    dir.create(env_path)
+  }
+  env_path
+}
+
+#' @importFrom crayon yellow
+#' @importFrom tibble tibble
+add_if_r_environment <- function(handle, env_path) {
+  if (!looks_like_r_environment(env_path)) {
+    warning(
+      yellow(
+        "Installation doesn't look like an renv object. It is being removed."),
+      call. = FALSE)
+    unlink(env_path, recursive = TRUE, force = TRUE)
+    invisible(FALSE)
+  } else {
+    l <- envi_list()
+    l <- rbind(l, tibble(handle = handle, path = env_path))
+    write_config(l, file.path(get_envi_path(), "environments.rds"))
+    invisible(TRUE)
+  }
+}
+
 #' @importFrom crayon yellow
 deactivate_if_activated <- function(confirm = interactive(), force = FALSE) {
   handle <- envi_current_handle()

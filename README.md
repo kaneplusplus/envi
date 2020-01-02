@@ -1,0 +1,157 @@
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+# envi
+
+<!-- badges: start -->
+
+[![Build
+Status](https://travis-ci.org/kaneplusplus/envi.svg?branch=master)](https://travis-ci.org/kaneplusplus/envi)
+[![codecov](https://codecov.io/gh/kaneplusplus/envi/branch/master/graph/badge.svg)](https://codecov.io/gh/kaneplusplus/envi)
+[![Lifecycle:
+experimental](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#experimental)
+<!-- badges: end -->
+
+The goal of the `envi` package is manage mulitple R environments
+(collections of package). This means providing functionality to retrieve
+remote environments, create new environments, and switch between
+environments. The `envi` package integrates functionality provided by
+Kevin Ushey’s [`renv`
+package](https://rstudio.github.io/renv/articles/renv.html), which
+provides individual environment fuctionality, and other packages
+including [`git2r`](https://docs.ropensci.org/git2r/) and
+[`piggyback`](https://github.com/ropensci/piggyback), which provides
+source control and access to remote environments.
+
+To draw an analogy from the Python community, just as `renv` is similar
+to [virtual environments](https://docs.python.org/3/tutorial/venv.html),
+`envi` is similar to [conda](https://conda.io/en/latest/). However, the
+scope is more limited in the following ways.
+
+1.  Conda is a general application independent of a programming language
+    or environment and configuration is generally performed from the
+    terminal. The `envi` package is used within the R programming
+    environment. This has the advantage of making it more accessible to
+    R users, who may not be have the system administration experience
+    needed to tune installations or troubleshoot problems with paths,
+    for example. On the other hand, `envi` environment configurations
+    and the R environments they manage can easily be modified by more
+    savvy users.
+2.  Conda functions as both a package manager, allowing you install
+    programming languages environments, as well as a manager for
+    programming-language specific libraries. While `envi` package allows
+    you to configure a Python environment through `renv`, it is intended
+    to create useful R environments. This limitation in scope makes the
+    management of package dependencies, on of Conda’s core goals, almost
+    trivial because of the R commuities enforcement of downstream
+    package compatibility via CRAN.
+
+## Installation
+
+The `envi` package is still under developement and is not available on
+CRAN. However, it can be installed from [GitHub](https://github.com/)
+with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("kaneplusplus/envi")
+```
+
+## Example
+
+Suppose you’d like to create a deep learning model with the `keras` but
+you don’t have Python installed, you do have Python installed but
+your’re not sure how to get R to talk with Python, or you’re feeling
+lazy. Instead of configuring your `keras` installation, you can download
+and manage an enironment on Github with `envi` on R version 2.6.1. You
+can check your version with `Sys.getenv()[['R_VERSION']]`
+
+``` r
+library(envi)
+
+# Get the appropriate repo for the platform.
+env_image <- switch(Sys.info()[['sysname']],
+                    Darwin = "keras-environmentx86_64-apple-darwin15.6.0.tar.bz2",
+                    Windows = "keras-environmentx86_64-w64-ming32.tar.bz2",
+                    Linux = "keras-environmentx86_64-pc-linux-gnu.tar.bz2")
+
+# Get the environment and call it keras-env. Note that the environment is big 
+# and the following can take some time.
+envi_pb_install(env_image, repo = "kaneplusplus/keras-envi", handle = "keras-env")
+#> Downloading piggyback'ed environment.
+#> Warning in get_token(): Using default public GITHUB_TOKEN.
+#>                      Please set your own token
+
+#> Warning in get_token(): Using default public GITHUB_TOKEN.
+#>                      Please set your own token
+#> Called from: envi_install_local_compressed(file.path(tempdir(), file), handle, 
+#>     verbose = verbose, progress = progress)
+#> debug: if (env_dir[length(env_dir)] == "zip") {
+#>     decompress <- unzip
+#>     env_dir <- paste(env_dir[1:(length(env_dir) - 1)], collapse = ".")
+#> } else {
+#>     decompress <- untar
+#>     env_dir <- paste(env_dir[1:(length(env_dir) - 2)], collapse = ".")
+#> }
+#> debug: decompress <- untar
+#> debug: env_dir <- paste(env_dir[1:(length(env_dir) - 2)], collapse = ".")
+#> debug: decompress(path, exdir = file.path(get_envi_path(), "environments"))
+#> debug: add_if_r_environment(handle, file.path(get_envi_path(), "environments", 
+#>     env_dir))
+#> [1] TRUE
+
+# See which environments we have and where they are located.
+envi_list()
+#> # A tibble: 1 x 2
+#>   handle    path                                                                
+#>   <chr>     <chr>                                                               
+#> 1 keras-env /Users/mike/.envi/environments/keras-environmentx86_64-apple-darwin…
+```
+
+Now that we have the environment, which includes `keras` and an
+installation of Python, let’s use it to build a simple deep learner.
+
+``` r
+# Load the reticulate first.
+library(reticulate)
+library(envi)
+
+# Activate the enviroment.
+envi_activate("keras-env")
+
+# Now we can use the environments packages and other functionality.
+library(keras)
+
+# Create a model to predict iris species.
+dl_model <- keras_model_sequential() %>%
+  layer_dense(units = 4) %>%
+  layer_dense(units = 3, activation = "softmax")
+
+dl_model %>% compile(
+  loss = loss_categorical_crossentropy,
+  optimizer = optimizer_adadelta(),
+  metrics = c("accuracy"))
+
+form <- Species ~ . -1
+
+iris_x <- model.matrix(form, iris)
+iris_y <- to_categorical(as.numeric(iris$Species) - 1)
+
+dl_model %>% fit(
+  iris_x,
+  iris_y,
+  batch_size = 150,
+  epoch = 1000,
+  validation_split = 0.1)
+
+dl_acc <-
+  apply(predict(dl_model, iris_x), 1, which.max) == as.numeric(iris$Species)
+sum(dl_acc) / length(dl_acc)
+#> [1] 0.9733333
+```
+
+# Code of Conduct
+
+Please note that the ‘envi’ project is released with a [Contributor Code
+of Conduct](CODE_OF_CONDUCT.md). By contributing to this project, you
+agree to abide by its terms.

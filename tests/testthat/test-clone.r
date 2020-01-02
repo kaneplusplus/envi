@@ -9,7 +9,7 @@ el <- envi_list()
 
 expect_true(nrow(el) == 0)
 
-expect_true(suppressWarnings(envi_create("test-env-1")))
+expect_true(suppressWarnings(envi_init("test-env-1")))
 
 expect_error(envi_activate("not-a-real-environment"))
 
@@ -49,3 +49,5 @@ commit(td, message = "Initial commit.", all = TRUE)
 expect_warning(expect_false(envi_clone(td, "bunk-clone")))
 
 expect_warning(envi_deactivate("bunk-clone"))
+
+suppressWarnings(envi_deactivate())

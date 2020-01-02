@@ -9,12 +9,12 @@ el <- envi_list()
 
 expect_true(nrow(el) == 0)
 
-expect_warning(expect_true(envi_create("test-env-1")))
+expect_warning(expect_true(envi_init("test-env-1")))
 
 expect_true(envi_current_handle() == "test-env-1")
 
 
-expect_warning(expect_true(envi_create("test-env-2")))
+expect_warning(expect_true(envi_init("test-env-2")))
 
 el <- envi_list()
 
@@ -33,3 +33,5 @@ expect_error(envi_uninstall("test-env-1"))
 # expect_true(purge_envi(confirm = FALSE))
 
 # expect_true(!dir.exists(temp_dir_name))
+
+suppressWarnings(envi_deactivate())
