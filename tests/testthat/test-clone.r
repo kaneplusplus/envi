@@ -11,6 +11,9 @@ expect_true(nrow(el) == 0)
 
 expect_true(suppressWarnings(envi_init("test-env-1")))
 
+library(renv)
+hydrate("testthat")
+
 expect_error(envi_activate("not-a-real-environment"))
 
 expect_true(envi_current_handle() == "test-env-1")
@@ -31,6 +34,9 @@ expect_warning(
   expect_true(envi_clone(envi_env_path("test-env-1"), "test-env-1-clone")))
 
 expect_true(envi_activate("test-env-1-clone"))
+
+library(renv)
+hydrate("testthat")
 
 commits(envi_env_path())
 

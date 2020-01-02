@@ -21,8 +21,7 @@ Suggests:
   covr,
   knitr,
   renv,
-  testthat,
-  devtools
+  testthat
 VignetteBuilder: knitr
 Encoding: UTF-8
 RoxygenNote: 7.0.2
