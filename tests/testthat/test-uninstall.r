@@ -1,9 +1,13 @@
 
 context("Uninstall an environment")
 
+library(renv)
+
 temp_dir_name <- tempdir()
 
 expect_true(set_envi_path(temp_dir_name))
+
+suppressWarnings(envi_deactivate())
 
 el <- envi_list()
 
@@ -12,7 +16,6 @@ expect_true(nrow(el) == 0)
 expect_warning(expect_true(envi_init("test-env-1")))
 
 expect_true(envi_current_handle() == "test-env-1")
-
 
 expect_warning(expect_true(envi_init("test-env-2")))
 

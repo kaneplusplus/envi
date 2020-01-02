@@ -10,18 +10,17 @@ Authors@R: c(
 Description: A package for retrieving and managing virtual environments.
 License: Apache License 2.0
 LazyData: true
-Imports:
+Imports: 
   crayon,
   desc,
   git2r,
   tibble,
   utils,
   piggyback
-Suggests:
+Suggests: 
+  cli,
   covr,
-  knitr,
   renv,
   testthat
-VignetteBuilder: knitr
 Encoding: UTF-8
 RoxygenNote: 7.0.2

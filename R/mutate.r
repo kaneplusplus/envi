@@ -46,7 +46,7 @@ envi_activate <- function(handle) {
 #' check have failed? (Default FALSE)
 #' @export
 envi_deactivate <- function(snapshot = TRUE, confirm = interactive(), 
-                            force = FALSE) {
+                            force = TRUE) {
   if (is.null(envi_current_handle())) {
     warning(yellow("No activated environment.`"), call. = FALSE)
     invisible(FALSE)
@@ -81,15 +81,26 @@ envi_init <- function(handle, full_name = handle, bare = FALSE,
     stop(red("The handle or full name is already in use."))
   }
   check_renv_installed()
-  new_env_path <- file.path(get_envi_path(), "environments", full_name)
-  cwd <- getwd()
-  deactivate_if_activated()
-  renv::init(new_env_path, bare = bare, restart = FALSE)
-  if (git_init) {
-    renv::hydrate("git2r")
-    git2r::init(new_env_path)
+  if (!dir.exists(file.path(get_envi_path(), "environments"))) {
+    dir.create(file.path(get_envi_path(), "environments"))
   }
-  setwd(cwd)
+  new_env_path <- file.path(get_envi_path(), "environments", full_name)
+  deactivate_if_activated()
+  tryCatch({
+      cwd <- getwd()
+      renv::init(new_env_path, bare = bare, restart = FALSE)
+      if (git_init) {
+        renv::hydrate("git2r")
+        git2r::init(new_env_path)
+      }
+      setwd(cwd)
+    },
+    error = function(e) {
+      if (cwd != getwd()) {
+        setwd(cwd)
+      }
+      stop(e)
+    })
   renv::hydrate(c("utf8", "vctrs"))
   l <- envi_list()
   l <- rbind(l, 
@@ -254,7 +265,7 @@ envi_uninstall <- function(handle, confirm = interactive(), purge = TRUE) {
   }
 
   # If the handle is active then deactivate.
-  deactivate_if_activated(confirm = confirm, force = FALSE)
+  deactivate_if_activated(confirm = confirm, force = TRUE)
 
   # Unlink the environments directory.
   if (purge) {
@@ -285,7 +296,7 @@ purge_envi <- function(confirm = TRUE) {
     # Purge the environment.
 
     # Deactivate the current environment.
-    deactivate_if_activated(confirm = confirm, force = FALSE)
+    deactivate_if_activated(confirm = confirm, force = TRUE)
 
     # Uninstall the environments.
     for (handle in envi_list()$handle) {
@@ -302,9 +313,9 @@ purge_envi <- function(confirm = TRUE) {
 
     # Unlink the envi path directory with prejudice and abandon.
     unlink(get_envi_path(), recursive = TRUE, force = TRUE)
-    TRUE
+    invisible(TRUE)
   } else {
-    FALSE
+    invisible(FALSE)
   }
 }
 

@@ -4,7 +4,7 @@
 \alias{envi_deactivate}
 \title{Deactivate an Environment}
 \usage{
-envi_deactivate(snapshot = TRUE, confirm = interactive(), force = FALSE)
+envi_deactivate(snapshot = TRUE, confirm = interactive(), force = TRUE)
 }
 \arguments{
 \item{snapshot}{should a snapshot be created on exit? (Default TRUE)}

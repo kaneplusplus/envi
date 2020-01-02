@@ -66,7 +66,7 @@ add_if_r_environment <- function(handle, env_path) {
 }
 
 #' @importFrom crayon yellow
-deactivate_if_activated <- function(confirm = interactive(), force = FALSE) {
+deactivate_if_activated <- function(confirm = interactive(), force = TRUE) {
   handle <- envi_current_handle()
   if (!is.null(handle)) {
     warning(yellow("Deactivating current environment `", handle,

@@ -1,6 +1,8 @@
 
 context("Reset and environment")
 
+library(renv)
+
 temp_dir_name <- tempdir()
 
 expect_true(set_envi_path(temp_dir_name))
@@ -14,6 +16,10 @@ expect_true(suppressWarnings(envi_init("test-env-1")))
 writeLines("test-file-1", file.path(envi_env_path(), 'test-file-1.txt'))
 init(envi_env_path())
 add(envi_env_path(), "*")
+
+config(repository(envi_env_path()), 
+       user.name="tester", user.email="tester@testthat.org")
+
 commit(envi_env_path(), message = "Initial commit", all = TRUE)
 
 envi_deactivate()

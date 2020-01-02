@@ -1,6 +1,8 @@
 
 context("Environment package information")
 
+library(renv)
+
 expect_true(set_envi_path(tempdir()))
 
 el <- envi_list()
