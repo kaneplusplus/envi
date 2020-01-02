@@ -84,21 +84,6 @@ envi_pb_install(env_image, repo = "kaneplusplus/keras-envi", handle = "keras-env
 
 #> Warning in get_token(): Using default public GITHUB_TOKEN.
 #>                      Please set your own token
-#> Called from: envi_install_local_compressed(file.path(tempdir(), file), handle, 
-#>     verbose = verbose, progress = progress)
-#> debug: if (env_dir[length(env_dir)] == "zip") {
-#>     decompress <- unzip
-#>     env_dir <- paste(env_dir[1:(length(env_dir) - 1)], collapse = ".")
-#> } else {
-#>     decompress <- untar
-#>     env_dir <- paste(env_dir[1:(length(env_dir) - 2)], collapse = ".")
-#> }
-#> debug: decompress <- untar
-#> debug: env_dir <- paste(env_dir[1:(length(env_dir) - 2)], collapse = ".")
-#> debug: decompress(path, exdir = file.path(get_envi_path(), "environments"))
-#> debug: add_if_r_environment(handle, file.path(get_envi_path(), "environments", 
-#>     env_dir))
-#> [1] TRUE
 
 # See which environments we have and where they are located.
 envi_list()
@@ -127,16 +112,18 @@ dl_model <- keras_model_sequential() %>%
   layer_dense(units = 4) %>%
   layer_dense(units = 3, activation = "softmax")
 
+# Compile the model.
 dl_model %>% compile(
   loss = loss_categorical_crossentropy,
   optimizer = optimizer_adadelta(),
   metrics = c("accuracy"))
 
+# Create the design matrix and dependent variables.
 form <- Species ~ . -1
-
 iris_x <- model.matrix(form, iris)
 iris_y <- to_categorical(as.numeric(iris$Species) - 1)
 
+# Fit the model.
 dl_model %>% fit(
   iris_x,
   iris_y,
@@ -144,10 +131,11 @@ dl_model %>% fit(
   epoch = 1000,
   validation_split = 0.1)
 
+# Calculate the model accuracy.
 dl_acc <-
   apply(predict(dl_model, iris_x), 1, which.max) == as.numeric(iris$Species)
 sum(dl_acc) / length(dl_acc)
-#> [1] 0.9733333
+#> [1] 0.98
 ```
 
 # Code of Conduct

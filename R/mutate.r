@@ -180,7 +180,7 @@ envi_pb_install <- function(file, repo,
   if (!keep) {
     unlink(file.path(tempdir(), file))
   } 
-  ret
+  invisible(ret)
 }
 
 #' Install a Local Compressed R Environment
@@ -197,7 +197,6 @@ envi_install_local_compressed <- function(path, handle = basename(path),
                         verbose = TRUE, progress = verbose) {
 
   env_dir <- unlist(strsplit(basename(path), "\\."))
-  browser()
   if (env_dir[length(env_dir)] == "zip") {
     decompress <- unzip
     env_dir <- paste(env_dir[1:(length(env_dir)-1)], collapse = ".")
@@ -206,8 +205,8 @@ envi_install_local_compressed <- function(path, handle = basename(path),
     env_dir <- paste(env_dir[1:(length(env_dir)-2)], collapse = ".")
   }
   decompress(path, exdir = file.path(get_envi_path(), "environments"))
-  add_if_r_environment(handle, 
-    file.path(get_envi_path(), "environments", env_dir))
+  invisible(add_if_r_environment(handle, 
+    file.path(get_envi_path(), "environments", env_dir)))
 }
 
 #' Clone an R Environment

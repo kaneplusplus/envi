@@ -75,16 +75,18 @@ dl_model <- keras_model_sequential() %>%
   layer_dense(units = 4) %>%
   layer_dense(units = 3, activation = "softmax")
 
+# Compile the model.
 dl_model %>% compile(
   loss = loss_categorical_crossentropy,
   optimizer = optimizer_adadelta(),
   metrics = c("accuracy"))
 
+# Create the design matrix and dependent variables.
 form <- Species ~ . -1
-
 iris_x <- model.matrix(form, iris)
 iris_y <- to_categorical(as.numeric(iris$Species) - 1)
 
+# Fit the model.
 dl_model %>% fit(
   iris_x,
   iris_y,
@@ -92,6 +94,7 @@ dl_model %>% fit(
   epoch = 1000,
   validation_split = 0.1)
 
+# Calculate the model accuracy.
 dl_acc <-
   apply(predict(dl_model, iris_x), 1, which.max) == as.numeric(iris$Species)
 sum(dl_acc) / length(dl_acc)
