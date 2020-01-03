@@ -48,10 +48,10 @@ git2r::init(td)
 file.create(file.path(td, "touch.txt"))
 writeLines("a file with text", file.path(td, "touch.txt"))
 git2r::add(td, file.path(td, "touch.txt"))
-config(repository(td), user.name="tester", user.email="tester@testthat.org")
+git2r::config(
+  git2r::repository(td), user.name="tester", user.email="tester@testthat.org")
 try(commit(td, message = "Initial commit.", all = TRUE))
 
 expect_warning(expect_false(envi_clone(td, "bunk-clone")))
 
-#expect_warning(envi_deactivate("bunk-clone"))
-
+expect_warning(envi_deactivate("bunk-clone"))

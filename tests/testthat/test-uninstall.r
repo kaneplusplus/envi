@@ -1,8 +1,6 @@
 
 context("Uninstall an environment")
 
-library(renv)
-
 temp_dir_name <- tempdir()
 
 expect_true(set_envi_path(temp_dir_name))

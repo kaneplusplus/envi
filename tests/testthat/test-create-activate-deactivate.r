@@ -13,8 +13,7 @@ el <- envi_list()
 
 expect_true(nrow(el) == 0)
 
-expect_warning(expect_true(
-  envi_init("test-env-1", "testing-environment-number-1")))
+expect_true(envi_init("test-env-1", "testing-environment-number-1"))
 
 expect_error(envi_init("test-env-1"))
 
@@ -40,7 +39,7 @@ expect_true(basename(el$path[2]) == "test-env-2")
 
 is.null(envi_current_handle())
 
-envi_uninstall("test-env-1")
+expect_warning(envi_uninstall("test-env-1"))
 envi_uninstall("test-env-2")
 
 #unlink(get_envi_path(), recursive = TRUE, force = TRUE)

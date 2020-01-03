@@ -75,6 +75,7 @@ deactivate_if_activated <- function(confirm = interactive(), force = TRUE) {
   
     envi_deactivate(handle, confirm, force)
   }
+  invisible(FALSE)
 }
 
 #' @importFrom git2r repository

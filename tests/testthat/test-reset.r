@@ -1,13 +1,9 @@
 
 context("Reset and environment")
 
-library(renv)
-
 temp_dir_name <- tempdir()
 
 expect_true(set_envi_path(temp_dir_name))
-
-library(git2r)
 
 vapply(envi_list()$handle, function(handle) envi_uninstall(handle), NA)
 
