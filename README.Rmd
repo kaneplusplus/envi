@@ -17,17 +17,17 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 [![Build Status](https://travis-ci.org/kaneplusplus/envi.svg?branch=master)](https://travis-ci.org/kaneplusplus/envi)
-[![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/presagia-analytics/envi?branch=master&svg=true)](https://ci.appveyor.com/project/presagia-analytics/envi)
+[![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/kaneplusplus/envi?branch=master&svg=true)](https://ci.appveyor.com/project/kaneplusplus/envi)
 [![codecov](https://codecov.io/gh/kaneplusplus/envi/branch/master/graph/badge.svg)](https://codecov.io/gh/kaneplusplus/envi)
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 <!-- badges: end -->
 
-The goal of the `envi` package is manage mulitple R environments (collections of package). This means providing functionality to retrieve remote environments, create new environments, and switch between environments. The `envi` package integrates functionality provided by Kevin Ushey's [`renv` package](https://rstudio.github.io/renv/articles/renv.html), which provides individual environment fuctionality, and other packages including [`git2r`](https://docs.ropensci.org/git2r/) and [`piggyback`](https://github.com/ropensci/piggyback), which provides source control and access to remote environments.
+The goal of the `envi` package is manage mulitple R environments (collections of package). This means providing functionality to retrieve remote environments, create new environments, and switch between them. The `envi` package integrates functionality provided by Kevin Ushey's [`renv` package](https://rstudio.github.io/renv/articles/renv.html), which provides individual environment fuctionality, and other packages including [`git2r`](https://docs.ropensci.org/git2r/) and [`piggyback`](https://github.com/ropensci/piggyback), which provides source control and access to remote environments.
 
-To draw an analogy from the Python community, just as `renv` is similar to [virtual environments](https://docs.python.org/3/tutorial/venv.html), `envi` is similar to [conda](https://conda.io/en/latest/). However, the scope is more limited in the following ways.
+To draw an analogy from the Python community, just as the `renv` package is similar to the [virtual environments](https://docs.python.org/3/tutorial/venv.html) functionality provided in Python, `envi` is similar to [conda](https://conda.io/en/latest/). However, the scope is more limited in the following ways.
 
-1. Conda is a general application independent of a programming language or environment and configuration is generally performed from the terminal. The `envi` package is used within the R programming environment. This has the advantage of making it more accessible to R users, who may not be have the system administration experience needed to tune installations or troubleshoot problems with paths, for example. On the other hand, `envi` environment configurations and the R environments they manage can easily be modified by more savvy users. 
-2. Conda functions as both a package manager, allowing you install programming languages environments, as well as a manager for programming-language specific libraries. While `envi` package allows you to configure a Python environment through `renv`, it is intended to create useful R environments. This limitation in scope makes the management of package dependencies, on of Conda's core goals, almost trivial because of the R commuities enforcement of downstream package compatibility via CRAN.
+1. Conda is a general application independent of a programming language or environment and configuration is generally performed from the terminal. The `envi` package is used from within the R programming environment. This has the advantage of making it more accessible to R users, who may not have the system administration experience needed to tune installations or troubleshoot problems with paths. At the same time, `envi` environment configurations and the R environments they manage can easily be modified by more savvy users. 
+2. Conda functions as both a package manager - allowing you install programming languages environments - as well as a manager for programming-language specific libraries. While `envi` package allows you to configure a Python environment through `renv`, it is intended to create and manage R environments. This limitation in scope makes the management of package dependencies, one of Conda's core goals, almost trivial because of the R commuities enforcement of downstream package compatibility via CRAN.
 
 ## Installation
 
@@ -39,7 +39,7 @@ devtools::install_github("kaneplusplus/envi")
 ```
 ## Example
 
-Suppose you'd like to create a deep learning model with the `keras` but you don't have Python installed, you do have Python installed but your're not sure how to get R to talk with Python, or you're feeling lazy. Instead of configuring your `keras` installation, you can download and manage an enironment on Github with `envi` on R version 2.6.1. You can check your version with `Sys.getenv()[['R_VERSION']]`
+Suppose you'd like to create a deep learning model with the `keras` but you don't have Python installed, you do have Python installed but you're not sure how to get R to talk with Python, or you're feeling lazy. Instead of configuring your `keras` installation, you can download and manage an enironment on Github with `envi` on R version 2.6.1. You can check your version with `Sys.getenv()[['R_VERSION']]`
 
 ```{r}
 library(envi)
