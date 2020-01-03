@@ -174,7 +174,7 @@ envi_pb_install <- function(file, repo,
   } else {
     pbi <- pb_list(repo = repo, tag = tag)
     if ( !(file %in% basename(pbi$file_name)) ) {
-      stop(red("Could not find file: ", file, 
+      stop(red("\nCould not find file: ", file, 
                "\nAvailable files are:\n\t",
                paste(pbi$file_name, sep = "\n\t")))
     }
