@@ -7,6 +7,8 @@
 
 [![Build
 Status](https://travis-ci.org/kaneplusplus/envi.svg?branch=master)](https://travis-ci.org/kaneplusplus/envi)
+[![AppVeyor build
+status](https://ci.appveyor.com/api/projects/status/github/presagia-analytics/envi?branch=master&svg=true)](https://ci.appveyor.com/project/presagia-analytics/envi)
 [![codecov](https://codecov.io/gh/kaneplusplus/envi/branch/master/graph/badge.svg)](https://codecov.io/gh/kaneplusplus/envi)
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#experimental)
@@ -135,7 +137,7 @@ dl_model %>% fit(
 dl_acc <-
   apply(predict(dl_model, iris_x), 1, which.max) == as.numeric(iris$Species)
 sum(dl_acc) / length(dl_acc)
-#> [1] 0.98
+#> [1] 0.9866667
 ```
 
 # Code of Conduct

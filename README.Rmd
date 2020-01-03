@@ -17,6 +17,7 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 [![Build Status](https://travis-ci.org/kaneplusplus/envi.svg?branch=master)](https://travis-ci.org/kaneplusplus/envi)
+[![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/presagia-analytics/envi?branch=master&svg=true)](https://ci.appveyor.com/project/presagia-analytics/envi)
 [![codecov](https://codecov.io/gh/kaneplusplus/envi/branch/master/graph/badge.svg)](https://codecov.io/gh/kaneplusplus/envi)
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 <!-- badges: end -->
