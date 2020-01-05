@@ -99,10 +99,6 @@ Now that we have the environment, which includes `keras` and an
 installation of Python, let’s use it to build a simple deep learner.
 
 ``` r
-# Load the reticulate first.
-library(reticulate)
-library(envi)
-
 # Activate the enviroment.
 envi_activate("keras-env")
 
