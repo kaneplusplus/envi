@@ -203,6 +203,7 @@ envi_pb_install <- function(file, repo,
 #' @importFrom git2r clone
 #' @importFrom tibble tibble
 #' @importFrom utils download.file untar unzip
+#' @importFrom crayon red yellow
 #' @export
 envi_install_local_compressed <- function(path, handle = basename(path), 
                         verbose = TRUE, progress = verbose) {
@@ -215,7 +216,43 @@ envi_install_local_compressed <- function(path, handle = basename(path),
     decompress <- untar
     env_dir <- paste(env_dir[1:(length(env_dir)-2)], collapse = ".")
   }
-  decompress(path, exdir = file.path(get_envi_path(), "environments"))
+  decompress_success <- FALSE
+  tryCatch(
+      {
+        decompress(path, exdir = file.path(get_envi_path(), "environments"))
+        decompress_success <- TRUE
+      },
+      error = function(e) {
+        if (Sys.info()[['sysname']] == "Windows") {
+          browser()
+          if (grepl("^cannot open file", e$message) &&
+              grepl("No such file or directory$", e$message)) {
+            warning(yellow("Trying Windows file length hack."))
+            
+            win_path <- Sys.getenv("HOMEDRIVE")
+            if (!is.null(win_path)) {
+              win_temp_dir <- "tmpwh"
+              while (dir.exists(file.path(win_path, win_temp_dir))) {
+                win_temp_dir <- paste0(win_temp_dir, "h")
+              }
+              dir.create(file.path(win_path, win_temp_dir))
+              decompress(path, exdir = file.path(win_path, win_temp_dir))
+              browser()
+              if (length(dir(file.path(win_path, win_temp_dir))) != 1) {
+                stop(red("Compressed file doesn't look like and environment."))
+              }
+              copy_from <- file.path(win_path, win_temp_dir, 
+                                     dir(file.path(win_path, win_temp_dir)))
+              file.copy(copy_from, file.path(get_envi_path(), "environments"),
+                        overwrite = FALSE, recursive = TRUE)
+              unlink(file.path(win_path, win_temp_dir), recursive = TRUE, 
+                     force = TRUE)
+            }
+          }
+        } else {
+          stop(e)
+        }
+      })
   invisible(add_if_r_environment(handle, 
     file.path(get_envi_path(), "environments", env_dir)))
 }
