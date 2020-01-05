@@ -51,8 +51,8 @@ envi_deactivate <- function(snapshot = TRUE, confirm = interactive(),
     warning(yellow("No activated environment.`"), call. = FALSE)
     invisible(FALSE)
   } else {
-    renv::snapshot(envi_env_path(), confirm = confirm, force = force)
-    renv::deactivate(envi_env_path())
+    renv::snapshot(confirm = confirm, force = force)
+    renv::deactivate()
     set_current_handle(NULL)
     invisible(TRUE)
   }
