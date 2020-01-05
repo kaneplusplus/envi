@@ -72,14 +72,14 @@ check your version with `Sys.getenv()[['R_VERSION']]`
 library(envi)
 
 # Get the appropriate repo for the platform.
-env_image <- switch(Sys.info()[['sysname']],
+envi_image <- switch(Sys.info()[['sysname']],
                     Darwin = "keras-environmentx86_64-apple-darwin15.6.0.tar.bz2",
-                    Windows = "keras-environmentx86_64-w64-ming32.tar.bz2",
+                    Windows = "keras-environmentx86_64-w64-mingw32.zip",
                     Linux = "keras-environmentx86_64-pc-linux-gnu.tar.bz2")
 
 # Get the environment and call it keras-env. Note that the environment is big 
 # and the following can take some time.
-envi_pb_install(env_image, repo = "kaneplusplus/keras-envi", handle = "keras-env")
+envi_pb_install(envi_image, repo = "kaneplusplus/keras-envi", handle = "keras-env")
 #> Downloading piggyback'ed environment.
 #> Warning in get_token(): Using default public GITHUB_TOKEN.
 #>                      Please set your own token
@@ -137,7 +137,7 @@ dl_model %>% fit(
 dl_acc <-
   apply(predict(dl_model, iris_x), 1, which.max) == as.numeric(iris$Species)
 sum(dl_acc) / length(dl_acc)
-#> [1] 0.9666667
+#> [1] 0.9866667
 ```
 
 # Code of Conduct

@@ -45,14 +45,14 @@ Suppose you'd like to create a deep learning model with the `keras` but you don'
 library(envi)
 
 # Get the appropriate repo for the platform.
-env_image <- switch(Sys.info()[['sysname']],
+envi_image <- switch(Sys.info()[['sysname']],
                     Darwin = "keras-environmentx86_64-apple-darwin15.6.0.tar.bz2",
                     Windows = "keras-environmentx86_64-w64-mingw32.zip",
                     Linux = "keras-environmentx86_64-pc-linux-gnu.tar.bz2")
 
 # Get the environment and call it keras-env. Note that the environment is big 
 # and the following can take some time.
-envi_pb_install(env_image, repo = "kaneplusplus/keras-envi", handle = "keras-env")
+envi_pb_install(envi_image, repo = "kaneplusplus/keras-envi", handle = "keras-env")
 
 # See which environments we have and where they are located.
 envi_list()
